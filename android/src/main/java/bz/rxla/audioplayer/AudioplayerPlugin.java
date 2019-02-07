@@ -64,6 +64,11 @@ public class AudioplayerPlugin implements MethodCallHandler {
         mute(muted);
         response.success(null);
         break;
+      case "changeSpeed":
+        float value = call.arguments();
+        changeSpeed(value);
+        response.success(null);
+        break;
       default:
         response.notImplemented();
     }
@@ -89,6 +94,14 @@ public class AudioplayerPlugin implements MethodCallHandler {
       mediaPlayer = null;
       channel.invokeMethod("audio.onStop", null);
     }
+  }
+
+  private void changeSpeed(float value){
+    handler.removeCallbacks(sendData);
+    if (mediaPlayer != null && android.os.Build.VERSION.SDK_INT>23) {
+      mediaPlayer.setPlaybackParams(mp.getPlaybackParams().setSpeed(value));
+    }
+
   }
 
   private void pause() {

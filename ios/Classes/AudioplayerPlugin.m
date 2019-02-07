@@ -65,6 +65,11 @@ FlutterMethodChannel *_channel;
                                   ^{
                                       [self seek:CMTimeMakeWithSeconds([call.arguments doubleValue], 1)];
                                       result(nil);
+                                  },
+                              @"changeSpeed":
+                                  ^{
+                                      [self changeSpeed:[call.arguments floatValue]];
+                                      result(nil);
                                   }
                               };
     
@@ -144,6 +149,11 @@ FlutterMethodChannel *_channel;
     [player pause];
     isPlaying = false;
     [_channel invokeMethod:@"audio.onPause" arguments:nil];
+}
+
+- (void)changeSpeed:(float) speed {
+    player.rate = speed;
+    [_channel invokeMethod:@"audio.onSpeed" arguments:@(speed)];
 }
 
 - (void)stop {
