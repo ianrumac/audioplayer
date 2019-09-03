@@ -44,7 +44,7 @@ public class AudioplayerPlugin implements MethodCallHandler {
   public void onMethodCall(MethodCall call, MethodChannel.Result response) {
     switch (call.method) {
       case "play":
-        play(call.argument("url").toString());
+        play(call.argument("url").toString(), Integer.valueOf(call.argument("from").toString()), Double.valueOf(call.argument("speed").toString()));
         response.success(null);
         break;
       case "pause":
@@ -113,8 +113,9 @@ public class AudioplayerPlugin implements MethodCallHandler {
     }
   }
 
-  private void play(String url) {
-
+  private void play(String url, int timestamp, double toSpeed ) {
+    final float playbackSpeed = (float) toSpeed;
+    final int from = timestamp;
     if (mediaPlayer == null) {
       mediaPlayer = new MediaPlayer();
       AudioAttributes audioAttribute = new AudioAttributes.Builder()
@@ -139,7 +140,17 @@ public class AudioplayerPlugin implements MethodCallHandler {
       mediaPlayer.setOnPreparedListener(new MediaPlayer.OnPreparedListener(){
         @Override
         public void onPrepared(MediaPlayer mp) {
-          mediaPlayer.start();
+          mediaPlayer.setPlaybackParams(mediaPlayer.getPlaybackParams().setSpeed(playbackSpeed));
+          if(from!=0){
+            mediaPlayer.seekTo(from * 1000);
+            mediaPlayer.setOnSeekCompleteListener(new MediaPlayer.OnSeekCompleteListener() {
+              @Override
+              public void onSeekComplete(MediaPlayer mp) {
+                mediaPlayer.start();
+              }
+            });}else{
+            mediaPlayer.start();
+          }
           channel.invokeMethod("audio.onStart", mediaPlayer.getDuration());
         }
       });

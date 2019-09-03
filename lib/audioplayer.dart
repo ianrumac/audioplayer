@@ -63,9 +63,11 @@ class AudioPlayer {
   /// Play a given url.
   ///
   ///
-  Future<void> playAndroid(String url, {bool isLocal: false}) async =>
+  Future<void> playAndroid(String url, {bool isLocal: false, int from: 0, double speed = 1.0}) async =>
       await _channel.invokeMethod('play', {
         'url': url,
+        'from': from,
+        'speed' : speed,
         'isLocal': isLocal,
       });
 
